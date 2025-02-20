@@ -44,8 +44,8 @@ SAMPLE <- readRDS("SAMPLE.rds")
 population <- readRDS("population.rds")
 
 
-# MICE-HD imputation
-MICE_HD = function(sub_dat, T_X1 = sum(population$X1), T_X2 = sum(population$X2), L = 10){
+# IH imputation
+IH = function(sub_dat, T_X1 = sum(population$X1), T_X2 = sum(population$X2), L = 10){
   
   n_unit0 = sum(sub_dat$U==0) # unit respondents
   n_unit1 = sum(sub_dat$U==1) # unit nonrespondents
@@ -110,7 +110,7 @@ MICE_HD = function(sub_dat, T_X1 = sum(population$X1), T_X2 = sum(population$X2)
 
 RESULTS = list()
 for(i in 1:length(SAMPLE)){
-  RESULTS[[i]] = MICE_HD(sub_dat=SAMPLE[[i]])
+  RESULTS[[i]] = IH(sub_dat=SAMPLE[[i]])
 }
 
 n_sim = length(SAMPLE)
