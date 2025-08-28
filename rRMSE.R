@@ -30,11 +30,15 @@ T_X1_true <- sum(population$X1)
 T_X2_true <- sum(population$X2)
 T_Y1_true <- sum(population$Y1)
 T_Y2_true <- sum(population$Y2)
+T_Y3_true <- sum(population$Y3)
+T_Y4_true <- sum(population$Y4)
+
 rRMSE_T_est_1 <- (1 / T_X1_true) * sqrt(sum((T_est[,1] - T_X1_true)^2) / (nrow(T_est) - 1))
 rRMSE_T_est_2 <- (1 / T_X2_true) * sqrt(sum((T_est[,2] - T_X2_true)^2) / (nrow(T_est) - 1))
 rRMSE_T_est_3 <- (1 / T_Y1_true) * sqrt(sum((T_est[,3] - T_Y1_true)^2) / (nrow(T_est) - 1))
 rRMSE_T_est_4 <- (1 / T_Y2_true) * sqrt(sum((T_est[,4] - T_Y2_true)^2) / (nrow(T_est) - 1))
-
+rRMSE_T_est_5 <- (1 / T_Y3_true) * sqrt(sum((T_est[,5] - T_Y3_true)^2) / (nrow(T_est) - 1))
+rRMSE_T_est_6 <- (1 / T_Y4_true) * sqrt(sum((T_est[,6] - T_Y4_true)^2) / (nrow(T_est) - 1))
 
 
 
