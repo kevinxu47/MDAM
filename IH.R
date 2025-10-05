@@ -39,8 +39,7 @@ solve_beta0 <- function(beta0, beta1, A, B, C) {
 }
 
 SAMPLE <- readRDS("SAMPLE.rds")
-population <- readRDS("population.rds")
-# SAMPLE <- SAMPLE[1:50] 
+population <- readRDS("population.rds") 
 
 
 # IH imputation
@@ -67,15 +66,28 @@ IH = function(sub_dat, T_X1 = sum(population$X1), T_X2 = sum(population$X2), L =
   sub_dat[sub_dat$U==0 & sub_dat$Ry3==1,]$Y3 = NA
   sub_dat[sub_dat$U==0 & sub_dat$Ry4==1,]$Y4 = NA
   
-  subdat.completed1 = mice(sub_dat[,c("X1","X2","Y1","Y2","Y3","Y4",'Rx1','Rx2','Ry1','Ry2','Ry3','Ry4')], m=1, maxit = 5, seed=1)
+  # MICE for item nonresponse with W controlled
+  vars <- c("X1","X2","Y1","Y2","Y3","Y4",
+            "Rx1","Rx2","Ry1","Ry2","Ry3","Ry4","W")
+  
+  ini  <- mice(sub_dat[, vars], m = 1, maxit = 0, seed = 1)
+  meth <- ini$method
+  pred <- ini$predictorMatrix
+  
+  meth["W"] <- ""     # do not impute W
+  pred[, "W"] <- 1    # W predicts everything
+  pred["W", ] <- 0    # nothing predicts W
+  diag(pred) <- 0
+  
+  subdat.completed1 <- mice(sub_dat[, vars], m = 1, maxit = 5, seed = 1,
+                            method = meth, predictorMatrix = pred)
   
   adj_dat = complete(subdat.completed1) %>% mutate(U=sub_dat$U, W=sub_dat$W, pi=sub_dat$pi, origin_W=sub_dat$origin_W)
   
   V_X1_pop_HT = sum((adj_dat$X1/adj_dat$pi)^2*(1-adj_dat$pi))
   V_X2_pop_HT = sum((adj_dat$X2/adj_dat$pi)^2*(1-adj_dat$pi))
   
-  impdat = mice(sub_dat[,c("X1","X2","Y1","Y2","Y3","Y4",'Rx1','Rx2','Ry1','Ry2','Ry3','Ry4')],
-                m=L, maxit = 5, seed=1)
+  impdat = mice(sub_dat[, vars], m = L, maxit = 5, seed = 1, method = meth, predictorMatrix = pred)
   
   IMP_DAT = list()
   
@@ -105,7 +117,7 @@ IH = function(sub_dat, T_X1 = sum(population$X1), T_X2 = sum(population$X2), L =
 }
 
 
-# The following codes are copied from Yang and Reiter, 2025
+# The following codes are modified from Yang and Reiter, 2025
 
 RESULTS = list()
 for(i in 1:length(SAMPLE)){
@@ -411,4 +423,5 @@ VarMDAM.list = list(Premissvar.T = apply(T_premiss, 2, var),
                     AvgEstVar.joint = colMeans(V_joint), 
                     AvgEstVar.given12 = colMeans(V_given12)
                     )
+
 
